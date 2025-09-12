@@ -215,12 +215,26 @@ body {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    height: 400px; /* 固定容器高度 */
 }
 
 .chart-container h3 {
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: 600;
+}
+
+.chart-container canvas {
+    max-height: 320px !important; /* 限制canvas最大高度 */
+    width: 100% !important;
+    height: auto !important;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 320px; /* 图表包装器固定高度 */
+    width: 100%;
 }
 
 /* 用户管理页面 */
@@ -421,12 +435,26 @@ body {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    height: 400px; /* 固定容器高度 */
 }
 
 .analytics-card h3 {
     margin-bottom: 20px;
     color: #2c3e50;
     font-weight: 600;
+}
+
+.analytics-card canvas {
+    max-height: 320px !important; /* 限制canvas最大高度 */
+    width: 100% !important;
+    height: auto !important;
+}
+
+.analytics-card .chart-wrapper {
+    position: relative;
+    height: 320px; /* 图表包装器固定高度 */
+    width: 100%;
 }
 
 /* 设置页面 */
