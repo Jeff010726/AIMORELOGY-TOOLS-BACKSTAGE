@@ -158,6 +158,83 @@ class AdminAPI {
             
             const count = users.filter(user => {
                 if (!user.createdAt) return false;
+                const userDate = new Date(user.createdAt).toISOString().split('T')[0];
+                return userDate === dateStr;
+            }).length;
+            
+            last7Days.push({
+                date: dateStr,
+                count: count
+            });
+        }
+        
+        return last7Days;
+    }
+
+    // 更新用户信息
+    async updateUser(openid, updates) {
+        try {
+            const response = await this.request('/admin/update_user_level', {
+                method: 'POST',
+                body: JSON.stringify({
+                    openid: openid,
+                    newLevel: updates.level,
+                    adminToken: 'admin_secret_token' // 这里应该从安全的地方获取
+                })
+            });
+
+            // 清除相关缓存
+            this.clearUserCaches();
+            
+            return response;
+        } catch (error) {
+            console.error('更新用户失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 删除用户
+    async deleteUser(openid) {
+        try {
+            const response = await this.request('/admin/delete_user', {
+                method: 'POST',
+                body: JSON.stringify({
+                    openid: openid,
+                    adminToken: 'admin_secret_token' // 这里应该从安全的地方获取
+                })
+            });
+
+            // 清除相关缓存
+            this.clearUserCaches();
+            
+            return response;
+        } catch (error) {
+            console.error('删除用户失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 清除用户相关缓存
+    clearUserCaches() {
+        const keysToDelete = [];
+        for (const key of this.cache.keys()) {
+            if (key.includes('/admin/users') || key.includes('/admin/stats')) {
+                keysToDelete.push(key);
+            }
+        }
+        keysToDelete.forEach(key => this.cache.delete(key));
+    }
+    getRegistrationTrend(users) {
+        const last7Days = [];
+        const today = new Date();
+        
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            const count = users.filter(user => {
+                if (!user.createdAt) return false;
                 const createdDate = new Date(user.createdAt).toISOString().split('T')[0];
                 return createdDate === dateStr;
             }).length;

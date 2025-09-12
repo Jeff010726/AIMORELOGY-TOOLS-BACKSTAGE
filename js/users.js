@@ -173,8 +173,18 @@ class UserManager {
                 <td>${createdAt}</td>
                 <td>${lastLoginAt}</td>
                 <td>
-                    <span style="font-weight: 600; color: #667eea;">${totalUsage}</span>
-                    <small style="color: #666;">/${user.limits?.daily || 10}</small>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <div>
+                            <span style="font-weight: 600; color: #667eea;">${totalUsage}</span>
+                            <small style="color: #666;">/${user.limits?.daily || 10}</small>
+                            <small style="color: #888; font-size: 10px;">普通</small>
+                        </div>
+                        <div>
+                            <span style="font-weight: 600; color: #43e97b;">${user.articleUsage?.total || 0}</span>
+                            <small style="color: #666;">/${user.limits?.articleDaily || 10}</small>
+                            <small style="color: #888; font-size: 10px;">文章</small>
+                        </div>
+                    </div>
                 </td>
                 <td>
                     <button class="action-btn btn-view" onclick="userManager.viewUser('${user.openid}')">
@@ -312,15 +322,24 @@ class UserManager {
                 <div class="usage-info-section">
                     <h4 style="margin-bottom: 15px; color: #2c3e50;">使用统计</h4>
                     
-                    <div class="detail-item" style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #555;">总使用次数:</label>
-                        <span style="font-size: 1.2rem; font-weight: 600; color: #667eea;">${user.usage?.total || 0}</span>
-                    </div>
-                    
-                    <div class="detail-item" style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #555;">今日使用:</label>
-                        <span style="font-size: 1.2rem; font-weight: 600; color: #43e97b;">${user.usage?.daily || 0}</span>
-                        <small style="color: #666;"> / ${user.limits?.daily || 10}</small>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">普通功能使用</div>
+                            <div style="font-size: 1.4rem; font-weight: 600; color: #667eea;">
+                                ${user.usage?.daily || 0}
+                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.daily || 10}</small>
+                            </div>
+                            <div style="font-size: 11px; color: #888;">总计: ${user.usage?.total || 0} 次</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #43e97b;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成使用</div>
+                            <div style="font-size: 1.4rem; font-weight: 600; color: #43e97b;">
+                                ${user.articleUsage?.daily || 0}
+                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.articleDaily || 10}</small>
+                            </div>
+                            <div style="font-size: 11px; color: #888;">总计: ${user.articleUsage?.total || 0} 篇</div>
+                        </div>
                     </div>
                     
                     <div class="detail-item" style="margin-bottom: 15px;">
@@ -365,28 +384,46 @@ class UserManager {
 
         if (!nicknameInput || !levelSelect) return;
 
-        const updates = {
-            nickname: nicknameInput.value.trim(),
-            level: levelSelect.value
-        };
+        const newLevel = levelSelect.value;
+        const oldLevel = this.currentUser.level;
 
-        try {
-            this.showLoading(true);
-            
-            const response = await window.adminAPI.updateUser(this.currentUser.openid, updates);
-            
-            if (response.success) {
-                alert('用户信息更新成功');
-                this.closeUserModal();
-                await this.loadUsers(); // 重新加载用户列表
-            } else {
-                alert('更新失败: ' + (response.error || '未知错误'));
+        // 如果等级发生变化，使用等级更新API
+        if (newLevel !== oldLevel) {
+            try {
+                this.showLoading(true);
+                
+                const response = await fetch('https://wechat-login-worker.internal-articleno.workers.dev/admin/update_user_level', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        openid: this.currentUser.openid,
+                        newLevel: newLevel,
+                        adminToken: 'admin_secret_token'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`用户等级更新成功！
+等级变更: ${oldLevel} → ${newLevel}
+新的使用限制已自动调整`);
+                    this.closeUserModal();
+                    await this.loadUsers(); // 重新加载用户列表
+                } else {
+                    alert('等级更新失败: ' + (result.error || '未知错误'));
+                }
+            } catch (error) {
+                console.error('更新用户等级失败:', error);
+                alert('更新失败: ' + error.message);
+            } finally {
+                this.showLoading(false);
             }
-        } catch (error) {
-            console.error('更新用户失败:', error);
-            alert('更新失败: ' + error.message);
-        } finally {
-            this.showLoading(false);
+        } else {
+            // 如果只是昵称变化，可以添加其他更新逻辑
+            alert('暂时只支持等级更新功能');
         }
     }
 
