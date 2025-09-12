@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMORELOGY 用户管理后台</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-cogs"></i> 管理后台</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>仪表盘</span>
+                </li>
+                <li class="menu-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>用户管理</span>
+                </li>
+                <li class="menu-item" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>数据分析</span>
+                </li>
+                <li class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>系统设置</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航 -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="page-title">仪表盘</h1>
+                </div>
+                <div class="header-right">
+                    <button class="refresh-btn" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> 刷新数据
+                    </button>
+                    <div class="admin-info">
+                        <i class="fas fa-user-shield"></i>
+                        <span>管理员</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <!-- 仪表盘页面 -->
+                <div id="dashboard-page" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-users">-</h3>
+                                <p>总用户数</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="vip-users">-</h3>
+                                <p>VIP用户</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="svip-users">-</h3>
+                                <p>SVIP用户</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="daily-active">-</h3>
+                                <p>今日活跃</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>用户等级分布</h3>
+                            <canvas id="userLevelChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>最近7天注册趋势</h3>
+                            <canvas id="registrationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户管理页面 -->
+                <div id="users-page" class="page">
+                    <div class="page-header">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="user-search" placeholder="搜索用户昵称或OpenID...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="level-filter">
+                                <option value="">所有等级</option>
+                                <option value="normal">普通用户</option>
+                                <option value="vip">VIP</option>
+                                <option value="svip">SVIP</option>
+                                <option value="admin">管理员</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>头像</th>
+                                    <th>昵称</th>
+                                    <th>OpenID</th>
+                                    <th>等级</th>
+                                    <th>注册时间</th>
+                                    <th>最后登录</th>
+                                    <th>使用次数</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- 用户数据将通过JavaScript动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination">
+                        <button id="prev-page" class="page-btn">上一页</button>
+                        <span id="page-info">第 1 页，共 1 页</span>
+                        <button id="next-page" class="page-btn">下一页</button>
+                    </div>
+                </div>
+
+                <!-- 数据分析页面 -->
+                <div id="analytics-page" class="page">
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>使用统计</h3>
+                            <canvas id="usageChart"></canvas>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>用户活跃度</h3>
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统设置页面 -->
+                <div id="settings-page" class="page">
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <h3>API配置</h3>
+                            <div class="setting-item">
+                                <label>后端API地址:</label>
+                                <input type="text" id="api-url" value="https://aimorelogybackend.site">
+                            </div>
+                            <div class="setting-item">
+                                <label>数据刷新间隔(秒):</label>
+                                <input type="number" id="refresh-interval" value="30" min="10" max="300">
+                            </div>
+                            <button class="save-btn" onclick="saveSettings()">保存设置</button>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <h3>系统信息</h3>
+                            <div class="system-info">
+                                <p><strong>版本:</strong> v1.0.0</p>
+                                <p><strong>最后更新:</strong> <span id="last-update">-</span></p>
+                                <p><strong>API状态:</strong> <span id="api-status" class="status-indicator">检查中...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 用户详情模态框 -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>用户详情</h3>
+                <span class="close" onclick="closeUserModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="user-modal-body">
+                <!-- 用户详情内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserModal()">关闭</button>
+                <button class="btn btn-primary" onclick="saveUserChanges()">保存更改</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载指示器 -->
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/users.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
