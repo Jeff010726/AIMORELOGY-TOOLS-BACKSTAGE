@@ -14,6 +14,13 @@ class ChartManager {
 
     // 初始化所有图表
     async initCharts() {
+        // 检查Chart.js是否可用
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js未加载，跳过图表初始化');
+            this.showAllChartsError('Chart.js库未加载');
+            return;
+        }
+
         try {
             await this.createUserLevelChart();
             await this.createRegistrationChart();
@@ -407,6 +414,17 @@ class ChartManager {
                 </div>
             </div>
         `;
+    }
+
+    // 显示所有图表错误
+    showAllChartsError(message) {
+        const chartIds = ['userLevelChart', 'registrationChart', 'usageChart', 'activityChart'];
+        chartIds.forEach(id => {
+            const ctx = document.getElementById(id);
+            if (ctx) {
+                this.showChartError(ctx, message);
+            }
+        });
     }
 
     // 刷新所有图表

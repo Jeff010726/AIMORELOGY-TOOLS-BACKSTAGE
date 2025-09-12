@@ -510,7 +510,28 @@ document.head.appendChild(style);
 
 // 页面加载完成后初始化应用
 document.addEventListener('DOMContentLoaded', () => {
-    window.adminApp = new AdminApp();
+    // 确保Chart.js已加载
+    if (typeof Chart !== 'undefined') {
+        window.adminApp = new AdminApp();
+    } else {
+        // 等待Chart.js加载
+        const checkChart = setInterval(() => {
+            if (typeof Chart !== 'undefined') {
+                clearInterval(checkChart);
+                window.adminApp = new AdminApp();
+            }
+        }, 100);
+        
+        // 10秒后超时
+        setTimeout(() => {
+            clearInterval(checkChart);
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js加载失败');
+                // 仍然初始化应用，但不创建图表
+                window.adminApp = new AdminApp();
+            }
+        }, 10000);
+    }
 });
 
 // 页面卸载前清理
