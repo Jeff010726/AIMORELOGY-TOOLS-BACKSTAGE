@@ -223,7 +223,17 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        // 确保Chart.js加载完成
+        window.chartJsLoaded = false;
+        if (typeof Chart !== 'undefined') {
+            window.chartJsLoaded = true;
+            console.log('Chart.js加载成功');
+        } else {
+            console.error('Chart.js加载失败');
+        }
+    </script>
     <script src="js/api.js"></script>
     <script src="js/charts.js"></script>
     <script src="js/users.js"></script>

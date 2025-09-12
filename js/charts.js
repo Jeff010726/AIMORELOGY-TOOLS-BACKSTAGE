@@ -17,17 +17,21 @@ class ChartManager {
         // 检查Chart.js是否可用
         if (typeof Chart === 'undefined') {
             console.error('Chart.js未加载，跳过图表初始化');
-            this.showAllChartsError('Chart.js库未加载');
+            this.showAllChartsError('Chart.js库未加载，请刷新页面重试');
             return;
         }
 
+        console.log('Chart.js版本:', Chart.version);
+        
         try {
             await this.createUserLevelChart();
             await this.createRegistrationChart();
             await this.createUsageChart();
             await this.createActivityChart();
+            console.log('所有图表初始化完成');
         } catch (error) {
             console.error('初始化图表失败:', error);
+            this.showAllChartsError('图表初始化失败: ' + error.message);
         }
     }
 
