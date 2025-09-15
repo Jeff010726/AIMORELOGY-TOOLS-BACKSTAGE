@@ -155,27 +155,46 @@ class AdminApp {
     // 更新仪表盘数据
     async updateDashboard() {
         try {
+            // 获取用户统计数据
             const statsData = await window.adminAPI.getUserStats();
             
             if (statsData.success) {
                 const stats = statsData.stats;
                 
-                // 更新统计卡片
+                // 更新用户统计卡片
                 this.updateStatCard('total-users', stats.total);
                 this.updateStatCard('vip-users', stats.vip);
                 this.updateStatCard('svip-users', stats.svip);
                 this.updateStatCard('daily-active', stats.dailyActive);
-                
-                // 初始化图表
-                if (window.chartManager) {
-                    await window.chartManager.initCharts();
-                }
             } else {
-                throw new Error(statsData.error || '获取统计数据失败');
+                throw new Error(statsData.error || '获取用户统计数据失败');
+            }
+
+            // 获取token统计数据
+            const tokenData = await window.adminAPI.getTokenStats();
+            
+            if (tokenData.success) {
+                const tokenStats = tokenData.stats;
+                
+                // 更新token统计卡片
+                this.updateStatCard('total-tokens', tokenStats.totalTokens || 0);
+                this.updateStatCard('daily-tokens', tokenStats.dailyTokens || 0);
+                
+                console.log('Token统计数据:', tokenStats);
+            } else {
+                console.error('获取token统计失败:', tokenData.error);
+                // 如果token统计失败，显示0
+                this.updateStatCard('total-tokens', 0);
+                this.updateStatCard('daily-tokens', 0);
+            }
+
+            // 初始化图表
+            if (window.chartManager) {
+                await window.chartManager.initCharts();
             }
         } catch (error) {
             console.error('更新仪表盘失败:', error);
-            this.showError('仪表盘数据加载失败');
+            this.showError('仪表盘数据加载失败: ' + error.message);
         }
     }
 
