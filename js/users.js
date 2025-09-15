@@ -176,11 +176,6 @@ class UserManager {
                 <td>
                     <div style="display: flex; flex-direction: column; gap: 2px;">
                         <div>
-                            <span style="font-weight: 600; color: #667eea;">${totalUsage}</span>
-                            <small style="color: #666;">/${user.limits?.daily || 10}</small>
-                            <small style="color: #888; font-size: 10px;">普通</small>
-                        </div>
-                        <div>
                             <span style="font-weight: 600; color: #43e97b;">${user.articleUsage?.daily || 0}</span>
                             <small style="color: #666;">/${user.limits?.daily || 10}</small>
                             <small style="color: #888; font-size: 10px;">文章</small>
@@ -192,13 +187,13 @@ class UserManager {
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">文章:</span>
                             <span style="font-weight: 600; color: #43e97b;">
-                                ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
+                                暂无数据
                             </span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">总计:</span>
                             <span style="font-weight: 600; color: #2c3e50;">
-                                ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
+                                暂无数据
                             </span>
                         </div>
                     </div>
@@ -206,13 +201,7 @@ class UserManager {
                 <td>
                     <div style="display: flex; flex-direction: column; gap: 2px; font-size: 11px;">
                         <div style="color: #666;">
-                            今日: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}
-                        </div>
-                        <div style="color: #666;">
-                            总计: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
-                        </div>
-                        <div style="color: #888;">
-                            更新: ${user.tokenUsage?.article?.lastResetDate || '-'}
+                            Token功能开发中...
                         </div>
                     </div>
                 </td>
@@ -352,16 +341,7 @@ class UserManager {
                 <div class="usage-info-section">
                     <h4 style="margin-bottom: 15px; color: #2c3e50;">使用统计</h4>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
-                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">普通功能使用</div>
-                            <div style="font-size: 1.4rem; font-weight: 600; color: #667eea;">
-                                ${user.usage?.daily || 0}
-                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.daily || 10}</small>
-                            </div>
-                            <div style="font-size: 11px; color: #888;">总计: ${user.usage?.total || 0} 次</div>
-                        </div>
-                        
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #43e97b;">
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成使用</div>
                             <div style="font-size: 1.4rem; font-weight: 600; color: #43e97b;">
@@ -386,29 +366,11 @@ class UserManager {
             
             <div style="margin-top: 20px;">
                 <h4 style="margin-bottom: 15px; color: #2c3e50;">Token消耗统计</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
-                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成Token</div>
-                        <div style="font-size: 1.2rem; font-weight: 600; color: #ff6b6b;">
-                            ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
-                        </div>
-                        <div style="font-size: 11px; color: #888; margin-top: 8px;">
-                            <div>今日消耗: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}</div>
-                            <div>总计消耗: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}</div>
-                            <div>最后更新: ${user.tokenUsage?.article?.lastResetDate || '-'}</div>
-                        </div>
-                    </div>
-                    
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">总Token消耗</div>
-                        <div style="font-size: 1.2rem; font-weight: 600; color: #4ecdc4;">
-                            ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
-                        </div>
-                        <div style="font-size: 11px; color: #888; margin-top: 8px;">
-                            <div>今日总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.daily || 0), 0).toLocaleString()}</div>
-                            <div>历史总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}</div>
-                            <div>模块数量: ${Object.keys(user.tokenUsage || {}).length}</div>
-                        </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; color: #666;">
+                    <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px; display: block; color: #17a2b8;"></i>
+                    <div style="font-size: 14px;">Token消耗统计功能开发中...</div>
+                    <div style="font-size: 12px; margin-top: 5px; color: #888;">
+                        后端数据结构需要更新以支持token统计
                     </div>
                 </div>
             </div>
