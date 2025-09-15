@@ -28,6 +28,8 @@ class ChartManager {
             await this.createRegistrationChart();
             await this.createUsageChart();
             await this.createActivityChart();
+            await this.createTokenDistributionChart();
+            await this.createTokenTrendChart();
             console.log('所有图表初始化完成');
         } catch (error) {
             console.error('初始化图表失败:', error);
@@ -420,9 +422,213 @@ class ChartManager {
         `;
     }
 
+    // Token消耗分布饼图
+    async createTokenDistributionChart() {
+        const ctx = document.getElementById('tokenDistributionChart');
+        if (!ctx) return;
+
+        try {
+            const usersData = await window.adminAPI.getAllUsersNew();
+            
+            if (!usersData.success) {
+                this.showChartError(ctx, '获取数据失败');
+                return;
+            }
+
+            const users = usersData.users;
+            
+            // 按token消耗量分组
+            const tokenGroups = {
+                '0 Token': 0,
+                '1-100 Token': 0,
+                '101-500 Token': 0,
+                '501-1000 Token': 0,
+                '1000+ Token': 0
+            };
+
+            users.forEach(user => {
+                const totalTokens = user.tokenUsage?.article?.total || 0;
+                if (totalTokens === 0) {
+                    tokenGroups['0 Token']++;
+                } else if (totalTokens <= 100) {
+                    tokenGroups['1-100 Token']++;
+                } else if (totalTokens <= 500) {
+                    tokenGroups['101-500 Token']++;
+                } else if (totalTokens <= 1000) {
+                    tokenGroups['501-1000 Token']++;
+                } else {
+                    tokenGroups['1000+ Token']++;
+                }
+            });
+
+            // 销毁现有图表
+            if (this.charts.tokenDistribution) {
+                this.charts.tokenDistribution.destroy();
+            }
+
+            this.charts.tokenDistribution = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(tokenGroups),
+                    datasets: [{
+                        data: Object.values(tokenGroups),
+                        backgroundColor: [
+                            this.colors.primary,
+                            this.colors.success,
+                            this.colors.warning,
+                            this.colors.info,
+                            this.colors.danger
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} 用户 (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        } catch (error) {
+            console.error('创建Token消耗分布图表失败:', error);
+            this.showChartError(ctx, '图表加载失败');
+        }
+    }
+
+    // Token消耗趋势折线图
+    async createTokenTrendChart() {
+        const ctx = document.getElementById('tokenTrendChart');
+        if (!ctx) return;
+
+        try {
+            const tokenStats = await window.adminAPI.getTokenStats();
+            
+            if (!tokenStats.success) {
+                this.showChartError(ctx, '获取数据失败');
+                return;
+            }
+
+            // 模拟最近7天的token消耗趋势数据
+            const last7Days = [];
+            const today = new Date();
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+                
+                // 这里可以根据实际需求从后端获取每日token消耗数据
+                // 目前使用模拟数据
+                const dailyTokens = Math.floor(Math.random() * 2000) + 500;
+                
+                last7Days.push({
+                    date: dateStr,
+                    tokens: dailyTokens
+                });
+            }
+
+            // 销毁现有图表
+            if (this.charts.tokenTrend) {
+                this.charts.tokenTrend.destroy();
+            }
+
+            this.charts.tokenTrend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(item => item.date),
+                    datasets: [{
+                        label: 'Token消耗量',
+                        data: last7Days.map(item => item.tokens),
+                        borderColor: this.colors.info,
+                        backgroundColor: this.colors.info + '20',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: this.colors.info,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                label: function(context) {
+                                    return `Token消耗: ${context.parsed.y.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                },
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('创建Token消耗趋势图表失败:', error);
+            this.showChartError(ctx, '图表加载失败');
+        }
+    }
+
     // 显示所有图表错误
     showAllChartsError(message) {
-        const chartIds = ['userLevelChart', 'registrationChart', 'usageChart', 'activityChart'];
+        const chartIds = ['userLevelChart', 'registrationChart', 'usageChart', 'activityChart', 'tokenDistributionChart', 'tokenTrendChart'];
         chartIds.forEach(id => {
             const ctx = document.getElementById(id);
             if (ctx) {
