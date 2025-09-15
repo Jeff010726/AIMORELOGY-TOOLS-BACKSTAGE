@@ -536,6 +536,7 @@ class ChartManager {
             // 计算最近7天的真实token消耗趋势
             const last7Days = [];
             const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
             
             for (let i = 6; i >= 0; i--) {
                 const date = new Date(today);
@@ -546,25 +547,22 @@ class ChartManager {
                 // 计算当天所有用户的token消耗总和
                 let dailyTokens = 0;
                 
-                users.forEach(user => {
-                    // 检查用户的token使用记录
-                    if (user.tokenUsage && user.tokenUsage.article) {
-                        const tokenUsage = user.tokenUsage.article;
-                        
-                        // 如果有每日重置记录，检查是否是当天的消耗
-                        if (tokenUsage.lastResetDate) {
-                            const resetDate = new Date(tokenUsage.lastResetDate).toISOString().split('T')[0];
-                            if (resetDate === dateStr) {
-                                dailyTokens += tokenUsage.daily || 0;
+                // 只有今天才统计daily数据，历史日期暂时显示0
+                // 因为当前数据结构只保存了daily和total，没有历史每日记录
+                if (dateStr === todayStr) {
+                    users.forEach(user => {
+                        if (user.tokenUsage && user.tokenUsage.article) {
+                            const tokenUsage = user.tokenUsage.article;
+                            // 检查lastResetDate是否是今天
+                            if (tokenUsage.lastResetDate) {
+                                const resetDate = new Date(tokenUsage.lastResetDate).toISOString().split('T')[0];
+                                if (resetDate === todayStr) {
+                                    dailyTokens += tokenUsage.daily || 0;
+                                }
                             }
                         }
-                        
-                        // 如果是今天，直接使用daily数据
-                        if (dateStr === today.toISOString().split('T')[0]) {
-                            dailyTokens += tokenUsage.daily || 0;
-                        }
-                    }
-                });
+                    });
+                }
                 
                 last7Days.push({
                     date: displayDate,
