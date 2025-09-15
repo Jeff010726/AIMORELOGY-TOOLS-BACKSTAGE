@@ -1,7 +1,7 @@
 // API配置和管理
 class AdminAPI {
     constructor() {
-        this.baseURL = 'https://aimorelogybackend.site';
+        this.baseURL = 'https://wechat-login-worker.internal-articleno.workers.dev';
         this.cache = new Map();
         this.cacheTimeout = 30000; // 30秒缓存
     }
