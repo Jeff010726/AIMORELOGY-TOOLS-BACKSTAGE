@@ -47,8 +47,8 @@ class UserManager {
         try {
             this.showLoading(true);
             
-            // 使用新的API接口
-            const response = await window.adminAPI.getAllUsersNew();
+            // 使用原来的API接口
+            const response = await window.adminAPI.getAllUsers();
             
             if (response.success) {
                 this.users = response.users;
