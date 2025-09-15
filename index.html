@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/users.css">
 </head>
 <body>
     <div class="admin-container">
@@ -95,6 +96,24 @@
                                 <p>今日活跃</p>
                             </div>
                         </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="total-tokens">-</h3>
+                                <p>总Token消耗</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="daily-tokens">-</h3>
+                                <p>今日Token消耗</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="charts-grid">
@@ -141,7 +160,8 @@
                                     <th>等级</th>
                                     <th>注册时间</th>
                                     <th>最后登录</th>
-                                    <th>使用次数</th>
+                                    <th>文章次数</th>
+                                    <th>Token消耗</th>
                                     <th>操作</th>
                                 </tr>
                             </thead>

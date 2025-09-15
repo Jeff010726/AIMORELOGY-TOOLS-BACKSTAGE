@@ -332,6 +332,56 @@ class AdminAPI {
             keys: Array.from(this.cache.keys())
         };
     }
+
+    // 获取token消耗统计
+    async getTokenStats(useCache = true) {
+        const cacheKey = this.getCacheKey('/admin/get_token_stats');
+        
+        if (useCache && this.isCacheValid(cacheKey)) {
+            return this.getCache(cacheKey);
+        }
+        
+        try {
+            const response = await this.request('/admin/get_token_stats', {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+            
+            if (response.success) {
+                this.setCache(cacheKey, response);
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('获取token统计失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 获取所有用户（新版本，使用新的后端接口）
+    async getAllUsersNew(useCache = true) {
+        const cacheKey = this.getCacheKey('/admin/get_all_users');
+        
+        if (useCache && this.isCacheValid(cacheKey)) {
+            return this.getCache(cacheKey);
+        }
+        
+        try {
+            const response = await this.request('/admin/get_all_users', {
+                method: 'POST',
+                body: JSON.stringify({})
+            });
+            
+            if (response.success) {
+                this.setCache(cacheKey, response);
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('获取用户列表失败:', error);
+            return { success: false, users: [], total: 0, error: error.message };
+        }
+    }
 }
 
 // 创建全局API实例

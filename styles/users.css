@@ -1,0 +1,213 @@
+/* 用户管理页面样式 */
+
+/* Token统计样式 */
+.token-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.token-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.token-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.token-value {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.token-value.total {
+    color: #4ecdc4;
+    font-size: 13px;
+}
+
+.token-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11px;
+    color: #666;
+}
+
+.token-details div {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 用户等级样式 */
+.user-level {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.level-normal {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.level-vip {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.level-svip {
+    background-color: #fce4ec;
+    color: #c2185b;
+}
+
+.level-admin {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* 操作按钮样式 */
+.action-btn {
+    padding: 4px 8px;
+    margin: 0 2px;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-view {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.btn-view:hover {
+    background-color: #bbdefb;
+}
+
+.btn-edit {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.btn-edit:hover {
+    background-color: #ffe0b2;
+}
+
+.btn-delete {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.btn-delete:hover {
+    background-color: #ffcdd2;
+}
+
+/* 用户头像样式 */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* 表格样式增强 */
+#users-table-body tr:hover {
+    background-color: #f8f9fa;
+}
+
+#users-table-body td {
+    vertical-align: middle;
+    padding: 12px 8px;
+}
+
+/* 模态框中的Token统计样式 */
+.modal .token-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.modal .token-stat-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.modal .token-stat-card.article {
+    border-left-color: #ff6b6b;
+}
+
+.modal .token-stat-card.total {
+    border-left-color: #4ecdc4;
+}
+
+.modal .token-stat-title {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.modal .token-stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.modal .token-stat-value.article {
+    color: #ff6b6b;
+}
+
+.modal .token-stat-value.total {
+    color: #4ecdc4;
+}
+
+.modal .token-stat-details {
+    font-size: 11px;
+    color: #888;
+}
+
+.modal .token-stat-details div {
+    margin-bottom: 2px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .token-stats {
+        font-size: 10px;
+    }
+    
+    .token-details {
+        font-size: 9px;
+    }
+    
+    .user-avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .action-btn {
+        padding: 2px 6px;
+        font-size: 10px;
+    }
+    
+    .modal .token-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
