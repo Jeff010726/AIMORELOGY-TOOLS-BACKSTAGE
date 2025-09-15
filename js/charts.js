@@ -524,28 +524,50 @@ class ChartManager {
         if (!ctx) return;
 
         try {
-            const tokenStats = await window.adminAPI.getTokenStats();
+            const usersData = await window.adminAPI.getAllUsersNew();
             
-            if (!tokenStats.success) {
+            if (!usersData.success) {
                 this.showChartError(ctx, '获取数据失败');
                 return;
             }
 
-            // 模拟最近7天的token消耗趋势数据
+            const users = usersData.users;
+            
+            // 计算最近7天的真实token消耗趋势
             const last7Days = [];
             const today = new Date();
             
             for (let i = 6; i >= 0; i--) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - i);
-                const dateStr = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+                const dateStr = date.toISOString().split('T')[0];
+                const displayDate = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
                 
-                // 这里可以根据实际需求从后端获取每日token消耗数据
-                // 目前使用模拟数据
-                const dailyTokens = Math.floor(Math.random() * 2000) + 500;
+                // 计算当天所有用户的token消耗总和
+                let dailyTokens = 0;
+                
+                users.forEach(user => {
+                    // 检查用户的token使用记录
+                    if (user.tokenUsage && user.tokenUsage.article) {
+                        const tokenUsage = user.tokenUsage.article;
+                        
+                        // 如果有每日重置记录，检查是否是当天的消耗
+                        if (tokenUsage.lastResetDate) {
+                            const resetDate = new Date(tokenUsage.lastResetDate).toISOString().split('T')[0];
+                            if (resetDate === dateStr) {
+                                dailyTokens += tokenUsage.daily || 0;
+                            }
+                        }
+                        
+                        // 如果是今天，直接使用daily数据
+                        if (dateStr === today.toISOString().split('T')[0]) {
+                            dailyTokens += tokenUsage.daily || 0;
+                        }
+                    }
+                });
                 
                 last7Days.push({
-                    date: dateStr,
+                    date: displayDate,
                     tokens: dailyTokens
                 });
             }
