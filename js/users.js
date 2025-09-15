@@ -187,13 +187,13 @@ class UserManager {
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">文章:</span>
                             <span style="font-weight: 600; color: #43e97b;">
-                                暂无数据
+                                ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
                             </span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">总计:</span>
                             <span style="font-weight: 600; color: #2c3e50;">
-                                暂无数据
+                                ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
                             </span>
                         </div>
                     </div>
@@ -201,7 +201,13 @@ class UserManager {
                 <td>
                     <div style="display: flex; flex-direction: column; gap: 2px; font-size: 11px;">
                         <div style="color: #666;">
-                            Token功能开发中...
+                            今日: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}
+                        </div>
+                        <div style="color: #666;">
+                            总计: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
+                        </div>
+                        <div style="color: #888;">
+                            更新: ${user.tokenUsage?.article?.lastResetDate || '-'}
                         </div>
                     </div>
                 </td>
@@ -366,11 +372,29 @@ class UserManager {
             
             <div style="margin-top: 20px;">
                 <h4 style="margin-bottom: 15px; color: #2c3e50;">Token消耗统计</h4>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; color: #666;">
-                    <i class="fas fa-info-circle" style="font-size: 2rem; margin-bottom: 10px; display: block; color: #17a2b8;"></i>
-                    <div style="font-size: 14px;">Token消耗统计功能开发中...</div>
-                    <div style="font-size: 12px; margin-top: 5px; color: #888;">
-                        后端数据结构需要更新以支持token统计
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成Token</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #ff6b6b;">
+                            ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
+                        </div>
+                        <div style="font-size: 11px; color: #888; margin-top: 8px;">
+                            <div>今日消耗: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}</div>
+                            <div>总计消耗: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}</div>
+                            <div>最后更新: ${user.tokenUsage?.article?.lastResetDate || '-'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">总Token消耗</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #4ecdc4;">
+                            ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
+                        </div>
+                        <div style="font-size: 11px; color: #888; margin-top: 8px;">
+                            <div>今日总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.daily || 0), 0).toLocaleString()}</div>
+                            <div>历史总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}</div>
+                            <div>模块数量: ${Object.keys(user.tokenUsage || {}).length}</div>
+                        </div>
                     </div>
                 </div>
             </div>
