@@ -204,7 +204,7 @@ class ChartManager {
         if (!ctx) return;
 
         try {
-            const usersData = await window.adminAPI.getAllUsers();
+            const usersData = await window.adminAPI.getAllUsersNew();
             
             if (!usersData.success) {
                 this.showChartError(ctx, '获取数据失败');
@@ -319,7 +319,7 @@ class ChartManager {
         if (!ctx) return;
 
         try {
-            const usersData = await window.adminAPI.getAllUsers();
+            const usersData = await window.adminAPI.getAllUsersNew();
             
             if (!usersData.success) {
                 this.showChartError(ctx, '获取数据失败');
