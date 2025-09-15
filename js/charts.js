@@ -223,7 +223,7 @@ class ChartManager {
             };
 
             users.forEach(user => {
-                const total = user.usage?.total || 0;
+                const total = user.articleUsage?.total || 0;
                 if (total === 0) {
                     usageGroups['0次']++;
                 } else if (total <= 5) {
@@ -338,7 +338,7 @@ class ChartManager {
 
             users.forEach(user => {
                 const level = user.level || 'normal';
-                const usage = user.usage?.total || 0;
+                const usage = user.articleUsage?.total || 0;
                 
                 if (levelStats[level]) {
                     levelStats[level].total += usage;
