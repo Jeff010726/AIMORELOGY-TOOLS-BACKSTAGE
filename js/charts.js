@@ -524,49 +524,26 @@ class ChartManager {
         if (!ctx) return;
 
         try {
-            const usersData = await window.adminAPI.getAllUsersNew();
+            // 使用新的历史数据接口
+            const historyData = await window.adminAPI.getTokenHistory();
             
-            if (!usersData.success) {
-                this.showChartError(ctx, '获取数据失败');
+            if (!historyData.success) {
+                this.showChartError(ctx, '获取历史数据失败');
                 return;
             }
 
-            const users = usersData.users;
-            
-            // 计算最近7天的真实token消耗趋势
+            // 处理历史数据
             const last7Days = [];
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
+            const dates = historyData.dates || [];
+            const consumption = historyData.consumption || [];
             
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
+            for (let i = 0; i < dates.length; i++) {
+                const date = new Date(dates[i]);
                 const displayDate = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-                
-                // 计算当天所有用户的token消耗总和
-                let dailyTokens = 0;
-                
-                // 只有今天才统计daily数据，历史日期暂时显示0
-                // 因为当前数据结构只保存了daily和total，没有历史每日记录
-                if (dateStr === todayStr) {
-                    users.forEach(user => {
-                        if (user.tokenUsage && user.tokenUsage.article) {
-                            const tokenUsage = user.tokenUsage.article;
-                            // 检查lastResetDate是否是今天
-                            if (tokenUsage.lastResetDate) {
-                                const resetDate = new Date(tokenUsage.lastResetDate).toISOString().split('T')[0];
-                                if (resetDate === todayStr) {
-                                    dailyTokens += tokenUsage.daily || 0;
-                                }
-                            }
-                        }
-                    });
-                }
                 
                 last7Days.push({
                     date: displayDate,
-                    tokens: dailyTokens
+                    tokens: consumption[i] || 0
                 });
             }
 

@@ -380,6 +380,30 @@ class AdminAPI {
             return { success: false, users: [], total: 0, error: error.message };
         }
     }
+
+    // 新增：获取7天token消耗历史数据
+    async getTokenHistory(useCache = true) {
+        const cacheKey = this.getCacheKey('/admin/get_token_history');
+        
+        if (useCache && this.isCacheValid(cacheKey)) {
+            return this.getCache(cacheKey);
+        }
+        
+        try {
+            const response = await this.request('/admin/get_token_history', {
+                method: 'GET'
+            });
+            
+            if (response.success) {
+                this.setCache(cacheKey, response);
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('获取token历史数据失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 // 创建全局API实例
