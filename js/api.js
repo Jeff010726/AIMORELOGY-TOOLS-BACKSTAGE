@@ -343,8 +343,7 @@ class AdminAPI {
         
         try {
             const response = await this.request('/admin/get_token_stats', {
-                method: 'POST',
-                body: JSON.stringify({})
+                method: 'GET'
             });
             
             if (response.success) {
@@ -368,8 +367,7 @@ class AdminAPI {
         
         try {
             const response = await this.request('/admin/get_all_users', {
-                method: 'POST',
-                body: JSON.stringify({})
+                method: 'GET'
             });
             
             if (response.success) {
