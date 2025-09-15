@@ -192,13 +192,13 @@ class UserManager {
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">文章:</span>
                             <span style="font-weight: 600; color: #43e97b;">
-                                ${(user.tokenConsumption?.article?.total || 0).toLocaleString()}
+                                ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
                             </span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span style="color: #666;">总计:</span>
                             <span style="font-weight: 600; color: #2c3e50;">
-                                ${Object.values(user.tokenConsumption || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
+                                ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
                             </span>
                         </div>
                     </div>
@@ -206,13 +206,13 @@ class UserManager {
                 <td>
                     <div style="display: flex; flex-direction: column; gap: 2px; font-size: 11px;">
                         <div style="color: #666;">
-                            输入: ${(user.tokenConsumption?.article?.prompt || 0).toLocaleString()}
+                            今日: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}
                         </div>
                         <div style="color: #666;">
-                            输出: ${(user.tokenConsumption?.article?.completion || 0).toLocaleString()}
+                            总计: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
                         </div>
                         <div style="color: #888;">
-                            次数: ${user.tokenConsumption?.article?.count || 0}
+                            更新: ${user.tokenUsage?.article?.lastResetDate || '-'}
                         </div>
                     </div>
                 </td>
@@ -390,24 +390,24 @@ class UserManager {
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff6b6b;">
                         <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成Token</div>
                         <div style="font-size: 1.2rem; font-weight: 600; color: #ff6b6b;">
-                            ${(user.tokenConsumption?.article?.total || 0).toLocaleString()}
+                            ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
                         </div>
                         <div style="font-size: 11px; color: #888; margin-top: 8px;">
-                            <div>输入Token: ${(user.tokenConsumption?.article?.prompt || 0).toLocaleString()}</div>
-                            <div>输出Token: ${(user.tokenConsumption?.article?.completion || 0).toLocaleString()}</div>
-                            <div>生成次数: ${user.tokenConsumption?.article?.count || 0}</div>
+                            <div>今日消耗: ${(user.tokenUsage?.article?.daily || 0).toLocaleString()}</div>
+                            <div>总计消耗: ${(user.tokenUsage?.article?.total || 0).toLocaleString()}</div>
+                            <div>最后更新: ${user.tokenUsage?.article?.lastResetDate || '-'}</div>
                         </div>
                     </div>
                     
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
                         <div style="font-size: 12px; color: #666; margin-bottom: 5px;">总Token消耗</div>
                         <div style="font-size: 1.2rem; font-weight: 600; color: #4ecdc4;">
-                            ${Object.values(user.tokenConsumption || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
+                            ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}
                         </div>
                         <div style="font-size: 11px; color: #888; margin-top: 8px;">
-                            <div>总输入: ${Object.values(user.tokenConsumption || {}).reduce((sum, module) => sum + (module.prompt || 0), 0).toLocaleString()}</div>
-                            <div>总输出: ${Object.values(user.tokenConsumption || {}).reduce((sum, module) => sum + (module.completion || 0), 0).toLocaleString()}</div>
-                            <div>总次数: ${Object.values(user.tokenConsumption || {}).reduce((sum, module) => sum + (module.count || 0), 0)}</div>
+                            <div>今日总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.daily || 0), 0).toLocaleString()}</div>
+                            <div>历史总计: ${Object.values(user.tokenUsage || {}).reduce((sum, module) => sum + (module.total || 0), 0).toLocaleString()}</div>
+                            <div>模块数量: ${Object.keys(user.tokenUsage || {}).length}</div>
                         </div>
                     </div>
                 </div>
