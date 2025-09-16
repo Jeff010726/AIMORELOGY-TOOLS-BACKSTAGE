@@ -184,14 +184,17 @@ class AdminApp {
 
             // 获取图片生成统计数据
             try {
-                const imageData = await window.adminAPI.getImageStats();
+                // 先清除图片统计缓存
+                window.adminAPI.clearCacheByKey('/admin/get_image_stats_{}');
+                
+                const imageData = await window.adminAPI.getImageStats(false);
                 
                 if (imageData.success) {
                     const imageStats = imageData.stats;
                     
-                    // 更新图片统计卡片
-                    this.updateStatCard('total-images', imageStats.total || 0);
-                    this.updateStatCard('daily-images', imageStats.daily || 0);
+                    // 更新图片统计卡片 - 使用正确的字段名
+                    this.updateStatCard('total-images', imageStats.totalImages || 0);
+                    this.updateStatCard('daily-images', imageStats.dailyImages || 0);
                     
                     console.log('图片生成统计数据:', imageStats);
                 } else {

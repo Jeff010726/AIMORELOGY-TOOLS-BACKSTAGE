@@ -32,6 +32,18 @@ class AdminAPI {
         return cached ? cached.data : null;
     }
 
+    // 清除所有缓存
+    clearCache() {
+        this.cache.clear();
+        console.log('缓存已清除');
+    }
+
+    // 清除特定缓存
+    clearCacheByKey(cacheKey) {
+        this.cache.delete(cacheKey);
+        console.log(`缓存已清除: ${cacheKey}`);
+    }
+
     // 通用API请求方法
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
@@ -402,7 +414,7 @@ class AdminAPI {
     }
 
     // 新增：获取图片生成统计数据
-    async getImageStats(useCache = true) {
+    async getImageStats(useCache = false) {
         const cacheKey = this.getCacheKey('/admin/get_image_stats');
         
         if (useCache && this.isCacheValid(cacheKey)) {
