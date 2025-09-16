@@ -3,7 +3,7 @@ class AdminApp {
     constructor() {
         this.currentPage = 'dashboard';
         this.refreshInterval = null;
-        this.autoRefreshEnabled = true;
+        this.autoRefreshEnabled = false; // 禁用自动刷新
         this.refreshIntervalTime = 30000; // 30秒
         
         this.init();
@@ -14,7 +14,8 @@ class AdminApp {
         try {
             this.initEventListeners();
             await this.loadInitialData();
-            this.startAutoRefresh();
+            // 移除自动刷新启动
+            // this.startAutoRefresh();
             
             console.log('管理后台初始化完成');
         } catch (error) {
@@ -51,7 +52,6 @@ class AdminApp {
 
         // 设置保存
         const apiUrlInput = document.getElementById('api-url');
-        const refreshIntervalInput = document.getElementById('refresh-interval');
         
         if (apiUrlInput) {
             apiUrlInput.addEventListener('change', () => {
@@ -60,13 +60,7 @@ class AdminApp {
             });
         }
         
-        if (refreshIntervalInput) {
-            refreshIntervalInput.addEventListener('change', () => {
-                this.refreshIntervalTime = parseInt(refreshIntervalInput.value) * 1000;
-                this.saveSettings();
-                this.restartAutoRefresh();
-            });
-        }
+        // 移除刷新间隔设置，因为已禁用自动刷新
 
         // 窗口大小变化时重新调整图表
         window.addEventListener('resize', () => {
@@ -268,17 +262,10 @@ class AdminApp {
         }
     }
 
-    // 开始自动刷新
+    // 开始自动刷新 - 已禁用
     startAutoRefresh() {
-        if (this.refreshInterval) {
-            clearInterval(this.refreshInterval);
-        }
-        
-        if (this.autoRefreshEnabled) {
-            this.refreshInterval = setInterval(() => {
-                this.refreshData();
-            }, this.refreshIntervalTime);
-        }
+        // 自动刷新功能已禁用，只保留手动刷新
+        console.log('自动刷新已禁用，请使用手动刷新按钮');
     }
 
     // 停止自动刷新
@@ -289,10 +276,10 @@ class AdminApp {
         }
     }
 
-    // 重启自动刷新
+    // 重启自动刷新 - 已禁用
     restartAutoRefresh() {
-        this.stopAutoRefresh();
-        this.startAutoRefresh();
+        // 自动刷新功能已禁用
+        console.log('自动刷新功能已禁用');
     }
 
     // 更新最后更新时间
@@ -308,22 +295,19 @@ class AdminApp {
         const settings = this.getSettings();
         
         const apiUrlInput = document.getElementById('api-url');
-        const refreshIntervalInput = document.getElementById('refresh-interval');
         
         if (apiUrlInput && settings.apiUrl) {
             apiUrlInput.value = settings.apiUrl;
         }
         
-        if (refreshIntervalInput && settings.refreshInterval) {
-            refreshIntervalInput.value = settings.refreshInterval / 1000;
-        }
+        // 移除刷新间隔设置加载，因为已禁用自动刷新
     }
 
     // 保存设置
     saveSettings() {
         const settings = {
             apiUrl: window.adminAPI.baseURL,
-            refreshInterval: this.refreshIntervalTime,
+            autoRefreshDisabled: true, // 标记自动刷新已禁用
             lastSaved: new Date().toISOString()
         };
         

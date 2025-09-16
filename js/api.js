@@ -70,33 +70,29 @@ class AdminAPI {
         }
 
         try {
-            // 首先尝试获取所有KV键
-            const keysResponse = await this.request('/admin/list_all_keys');
+            // 优先使用新的 get_all_users 接口
+            const response = await this.request('/admin/get_all_users');
             
-            if (!keysResponse.success) {
-                throw new Error('获取用户键列表失败');
+            if (response.success) {
+                const result = { success: true, users: response.users, total: response.total };
+                this.setCache(cacheKey, result);
+                return result;
+            } else {
+                throw new Error(response.error || '获取用户数据失败');
             }
-
-            const userKeys = keysResponse.keys.filter(key => key.name.startsWith('user:'));
-            const users = [];
-
-            // 批量获取用户数据
-            for (const keyInfo of userKeys) {
-                try {
-                    const userResponse = await this.request(`/admin/get_user?key=${encodeURIComponent(keyInfo.name)}`);
-                    if (userResponse.success && userResponse.user) {
-                        users.push(userResponse.user);
-                    }
-                } catch (error) {
-                    console.warn(`获取用户数据失败 ${keyInfo.name}:`, error);
-                }
-            }
-
-            const result = { success: true, users, total: users.length };
-            this.setCache(cacheKey, result);
-            return result;
         } catch (error) {
             console.error('获取用户列表失败:', error);
+            
+            // 如果是 KV limit 错误，返回友好的错误信息
+            if (error.message.includes('limit exceeded')) {
+                return { 
+                    success: false, 
+                    users: [], 
+                    total: 0, 
+                    error: 'Cloudflare KV 每日查询限制已达上限，请明天再试或升级到付费计划' 
+                };
+            }
+            
             return { success: false, users: [], total: 0, error: error.message };
         }
     }
