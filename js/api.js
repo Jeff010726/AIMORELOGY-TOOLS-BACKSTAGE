@@ -410,7 +410,7 @@ class AdminAPI {
         }
         
         try {
-            const response = await this.request('/admin/get_image_stats', {
+            const response = await this.request('/admin/get_image_stats?adminToken=admin_secret_token', {
                 method: 'GET'
             });
             
