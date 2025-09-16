@@ -180,6 +180,11 @@ class UserManager {
                             <small style="color: #666;">/${this.getLevelLimitNumber(user)}</small>
                             <small style="color: #888; font-size: 10px;">文章</small>
                         </div>
+                        <div>
+                            <span style="font-weight: 600; color: #f093fb;">${user.imageUsage?.daily || 0}</span>
+                            <small style="color: #666;">/${this.getImageLimitNumber(user)}</small>
+                            <small style="color: #888; font-size: 10px;">图片</small>
+                        </div>
                     </div>
                 </td>
                 <td>
@@ -188,6 +193,12 @@ class UserManager {
                             <span style="color: #666;">文章:</span>
                             <span style="font-weight: 600; color: #43e97b;">
                                 ${(user.tokenUsage?.article?.total || 0).toLocaleString()}
+                            </span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">图片:</span>
+                            <span style="font-weight: 600; color: #f093fb;">
+                                ${(user.tokenUsage?.image?.total || 0).toLocaleString()}
                             </span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
@@ -293,6 +304,30 @@ class UserManager {
         const limit = user.limits?.articleDaily !== undefined ? 
             user.limits.articleDaily : 
             defaultLimits[level];
+            
+        return limit === -1 ? '∞' : limit;
+    }
+
+    // 获取图片生成等级限制数字
+    getImageLimitNumber(user) {
+        const level = user.level || 'normal';
+        
+        // 如果是管理员，直接返回无限制
+        if (level === 'admin') {
+            return '∞';
+        }
+        
+        // 图片生成的默认等级限制
+        const defaultImageLimits = {
+            'normal': 3,
+            'vip': 10,
+            'svip': 20,
+            'admin': -1
+        };
+        
+        const limit = user.limits?.imageDaily !== undefined ? 
+            user.limits.imageDaily : 
+            defaultImageLimits[level];
             
         return limit === -1 ? '∞' : limit;
     }

@@ -182,6 +182,31 @@ class AdminApp {
                 this.updateStatCard('daily-tokens', 0);
             }
 
+            // 获取图片生成统计数据
+            try {
+                const imageData = await window.adminAPI.getImageStats();
+                
+                if (imageData.success) {
+                    const imageStats = imageData.stats;
+                    
+                    // 更新图片统计卡片
+                    this.updateStatCard('total-images', imageStats.total || 0);
+                    this.updateStatCard('daily-images', imageStats.daily || 0);
+                    
+                    console.log('图片生成统计数据:', imageStats);
+                } else {
+                    console.error('获取图片统计失败:', imageData.error);
+                    // 如果图片统计失败，显示0
+                    this.updateStatCard('total-images', 0);
+                    this.updateStatCard('daily-images', 0);
+                }
+            } catch (error) {
+                console.error('获取图片统计数据失败:', error);
+                // 如果请求失败，显示0
+                this.updateStatCard('total-images', 0);
+                this.updateStatCard('daily-images', 0);
+            }
+
             // 初始化图表
             if (window.chartManager) {
                 await window.chartManager.initCharts();

@@ -400,6 +400,30 @@ class AdminAPI {
             return { success: false, error: error.message };
         }
     }
+
+    // 新增：获取图片生成统计数据
+    async getImageStats(useCache = true) {
+        const cacheKey = this.getCacheKey('/admin/get_image_stats');
+        
+        if (useCache && this.isCacheValid(cacheKey)) {
+            return this.getCache(cacheKey);
+        }
+        
+        try {
+            const response = await this.request('/admin/get_image_stats', {
+                method: 'GET'
+            });
+            
+            if (response.success) {
+                this.setCache(cacheKey, response);
+            }
+            
+            return response;
+        } catch (error) {
+            console.error('获取图片生成统计失败:', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 // 创建全局API实例
