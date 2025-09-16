@@ -249,6 +249,34 @@ class UserManager {
         return levelMap[level] || '普通用户';
     }
 
+    // 获取等级限制文本
+    getLevelLimitText(user) {
+        const level = user.level || 'normal';
+        const limits = {
+            'normal': 10,
+            'vip': 30,
+            'svip': 100,
+            'admin': -1
+        };
+        
+        const limit = user.limits?.articleDaily || limits[level];
+        return limit === -1 ? '无限制' : `${limit}次/天`;
+    }
+
+    // 获取等级限制数字
+    getLevelLimitNumber(user) {
+        const level = user.level || 'normal';
+        const limits = {
+            'normal': 10,
+            'vip': 30,
+            'svip': 100,
+            'admin': -1
+        };
+        
+        const limit = user.limits?.articleDaily || limits[level];
+        return limit === -1 ? '∞' : limit;
+    }
+
     // HTML转义
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -352,10 +380,10 @@ class UserManager {
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成使用</div>
                             <div style="font-size: 1.4rem; font-weight: 600; color: #43e97b;">
                                 ${user.articleUsage?.daily || 0}
-                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.articleDaily || user.limits?.daily || 10}</small>
+                                <small style="font-size: 0.8rem; color: #666;"> / ${this.getLevelLimitNumber(user)}</small>
                             </div>
                             <div style="font-size: 11px; color: #888;">总计: ${user.articleUsage?.total || 0} 次</div>
-                            <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${user.limits?.articleDaily || user.limits?.daily || 10}次/天)</div>
+                            <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${this.getLevelLimitText(user)})</div>
                         </div>
                     </div>
                     
