@@ -177,7 +177,7 @@ class UserManager {
                     <div style="display: flex; flex-direction: column; gap: 2px;">
                         <div>
                             <span style="font-weight: 600; color: #43e97b;">${user.articleUsage?.daily || 0}</span>
-                            <small style="color: #666;">/${user.limits?.articleDaily || user.limits?.daily || 10}</small>
+                            <small style="color: #666;">/${this.getLevelLimitNumber(user)}</small>
                             <small style="color: #888; font-size: 10px;">文章</small>
                         </div>
                     </div>
@@ -252,28 +252,48 @@ class UserManager {
     // 获取等级限制文本
     getLevelLimitText(user) {
         const level = user.level || 'normal';
-        const limits = {
+        
+        // 如果是管理员，直接返回无限制
+        if (level === 'admin') {
+            return '无限制';
+        }
+        
+        // 优先使用用户实际的限制，如果没有则使用默认等级限制
+        const defaultLimits = {
             'normal': 10,
             'vip': 30,
             'svip': 100,
             'admin': -1
         };
         
-        const limit = user.limits?.articleDaily || limits[level];
+        const limit = user.limits?.articleDaily !== undefined ? 
+            user.limits.articleDaily : 
+            defaultLimits[level];
+            
         return limit === -1 ? '无限制' : `${limit}次/天`;
     }
 
     // 获取等级限制数字
     getLevelLimitNumber(user) {
         const level = user.level || 'normal';
-        const limits = {
+        
+        // 如果是管理员，直接返回无限制
+        if (level === 'admin') {
+            return '∞';
+        }
+        
+        // 优先使用用户实际的限制，如果没有则使用默认等级限制
+        const defaultLimits = {
             'normal': 10,
             'vip': 30,
             'svip': 100,
             'admin': -1
         };
         
-        const limit = user.limits?.articleDaily || limits[level];
+        const limit = user.limits?.articleDaily !== undefined ? 
+            user.limits.articleDaily : 
+            defaultLimits[level];
+            
         return limit === -1 ? '∞' : limit;
     }
 
