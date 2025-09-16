@@ -469,7 +469,7 @@ class UserManager {
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">图片生成使用</div>
                             <div style="font-size: 1.4rem; font-weight: 600; color: #ff9f43;">
                                 ${user.imageUsage?.daily || 0}
-                                <small style="font-size: 0.8rem; color: #666;"> / ${this.getImageLevelLimitNumber(user)}</small>
+                                <small style="font-size: 0.8rem; color: #666;"> / ${this.getImageLimitNumber(user)}</small>
                             </div>
                             <div style="font-size: 11px; color: #888;">总计: ${user.imageUsage?.total || 0} 次</div>
                             <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${this.getImageLevelLimitText(user)})</div>
