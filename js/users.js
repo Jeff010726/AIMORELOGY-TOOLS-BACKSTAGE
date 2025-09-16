@@ -332,6 +332,30 @@ class UserManager {
         return limit === -1 ? '∞' : limit;
     }
 
+    // 获取图片生成等级限制文本
+    getImageLevelLimitText(user) {
+        const level = user.level || 'normal';
+        
+        // 如果是管理员，直接返回无限制
+        if (level === 'admin') {
+            return '无限制';
+        }
+        
+        // 图片生成的默认等级限制
+        const defaultImageLimits = {
+            'normal': 3,
+            'vip': 10,
+            'svip': 20,
+            'admin': -1
+        };
+        
+        const limit = user.limits?.imageDaily !== undefined ? 
+            user.limits.imageDaily : 
+            defaultImageLimits[level];
+            
+        return limit === -1 ? '无限制' : `${limit}次/天`;
+    }
+
     // HTML转义
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -430,7 +454,7 @@ class UserManager {
                 <div class="usage-info-section">
                     <h4 style="margin-bottom: 15px; color: #2c3e50;">使用统计</h4>
                     
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #43e97b;">
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成使用</div>
                             <div style="font-size: 1.4rem; font-weight: 600; color: #43e97b;">
@@ -439,6 +463,16 @@ class UserManager {
                             </div>
                             <div style="font-size: 11px; color: #888;">总计: ${user.articleUsage?.total || 0} 次</div>
                             <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${this.getLevelLimitText(user)})</div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #ff9f43;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">图片生成使用</div>
+                            <div style="font-size: 1.4rem; font-weight: 600; color: #ff9f43;">
+                                ${user.imageUsage?.daily || 0}
+                                <small style="font-size: 0.8rem; color: #666;"> / ${this.getImageLevelLimitNumber(user)}</small>
+                            </div>
+                            <div style="font-size: 11px; color: #888;">总计: ${user.imageUsage?.total || 0} 次</div>
+                            <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${this.getImageLevelLimitText(user)})</div>
                         </div>
                     </div>
                     
