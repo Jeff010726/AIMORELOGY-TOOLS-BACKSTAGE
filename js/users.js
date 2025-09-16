@@ -177,7 +177,7 @@ class UserManager {
                     <div style="display: flex; flex-direction: column; gap: 2px;">
                         <div>
                             <span style="font-weight: 600; color: #43e97b;">${user.articleUsage?.daily || 0}</span>
-                            <small style="color: #666;">/${user.limits?.daily || 10}</small>
+                            <small style="color: #666;">/${user.limits?.articleDaily || user.limits?.daily || 10}</small>
                             <small style="color: #888; font-size: 10px;">文章</small>
                         </div>
                     </div>
@@ -352,9 +352,10 @@ class UserManager {
                             <div style="font-size: 12px; color: #666; margin-bottom: 5px;">文章生成使用</div>
                             <div style="font-size: 1.4rem; font-weight: 600; color: #43e97b;">
                                 ${user.articleUsage?.daily || 0}
-                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.daily || 10}</small>
+                                <small style="font-size: 0.8rem; color: #666;"> / ${user.limits?.articleDaily || user.limits?.daily || 10}</small>
                             </div>
                             <div style="font-size: 11px; color: #888;">总计: ${user.articleUsage?.total || 0} 次</div>
+                            <div style="font-size: 11px; color: #888;">等级: ${this.getLevelText(user.level)} (${user.limits?.articleDaily || user.limits?.daily || 10}次/天)</div>
                         </div>
                     </div>
                     
