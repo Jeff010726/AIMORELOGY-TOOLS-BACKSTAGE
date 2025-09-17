@@ -200,7 +200,7 @@ class ChartManager {
         }
     }
 
-    // 使用统计柱状图
+    // 使用统计柱状图（文章生成 vs 图片生成）
     async createUsageChart() {
         const ctx = document.getElementById('usageChart');
         if (!ctx) return;
@@ -215,8 +215,17 @@ class ChartManager {
 
             const users = usersData.users;
             
-            // 按使用次数分组
-            const usageGroups = {
+            // 按使用次数分组 - 文章生成
+            const articleGroups = {
+                '0次': 0,
+                '1-5次': 0,
+                '6-10次': 0,
+                '11-20次': 0,
+                '20次以上': 0
+            };
+
+            // 按使用次数分组 - 图片生成
+            const imageGroups = {
                 '0次': 0,
                 '1-5次': 0,
                 '6-10次': 0,
@@ -225,17 +234,32 @@ class ChartManager {
             };
 
             users.forEach(user => {
-                const total = user.articleUsage?.total || 0;
-                if (total === 0) {
-                    usageGroups['0次']++;
-                } else if (total <= 5) {
-                    usageGroups['1-5次']++;
-                } else if (total <= 10) {
-                    usageGroups['6-10次']++;
-                } else if (total <= 20) {
-                    usageGroups['11-20次']++;
+                // 文章生成统计
+                const articleTotal = user.articleUsage?.total || 0;
+                if (articleTotal === 0) {
+                    articleGroups['0次']++;
+                } else if (articleTotal <= 5) {
+                    articleGroups['1-5次']++;
+                } else if (articleTotal <= 10) {
+                    articleGroups['6-10次']++;
+                } else if (articleTotal <= 20) {
+                    articleGroups['11-20次']++;
                 } else {
-                    usageGroups['20次以上']++;
+                    articleGroups['20次以上']++;
+                }
+
+                // 图片生成统计
+                const imageTotal = user.imageUsage?.total || 0;
+                if (imageTotal === 0) {
+                    imageGroups['0次']++;
+                } else if (imageTotal <= 5) {
+                    imageGroups['1-5次']++;
+                } else if (imageTotal <= 10) {
+                    imageGroups['6-10次']++;
+                } else if (imageTotal <= 20) {
+                    imageGroups['11-20次']++;
+                } else {
+                    imageGroups['20次以上']++;
                 }
             });
 
@@ -247,24 +271,20 @@ class ChartManager {
             this.charts.usage = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: Object.keys(usageGroups),
+                    labels: Object.keys(articleGroups),
                     datasets: [{
-                        label: '用户数量',
-                        data: Object.values(usageGroups),
-                        backgroundColor: [
-                            this.colors.primary + '80',
-                            this.colors.success + '80',
-                            this.colors.warning + '80',
-                            this.colors.info + '80',
-                            this.colors.danger + '80'
-                        ],
-                        borderColor: [
-                            this.colors.primary,
-                            this.colors.success,
-                            this.colors.warning,
-                            this.colors.info,
-                            this.colors.danger
-                        ],
+                        label: '文章生成用户数',
+                        data: Object.values(articleGroups),
+                        backgroundColor: this.colors.primary + '80',
+                        borderColor: this.colors.primary,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }, {
+                        label: '图片生成用户数',
+                        data: Object.values(imageGroups),
+                        backgroundColor: this.colors.success + '80',
+                        borderColor: this.colors.success,
                         borderWidth: 2,
                         borderRadius: 8,
                         borderSkipped: false
@@ -275,12 +295,25 @@ class ChartManager {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             titleColor: '#fff',
-                            bodyColor: '#fff'
+                            bodyColor: '#fff',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y} 用户`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -315,7 +348,7 @@ class ChartManager {
         }
     }
 
-    // 用户活跃度雷达图
+    // 用户活跃度雷达图（文章生成 vs 图片生成）
     async createActivityChart() {
         const ctx = document.getElementById('activityChart');
         if (!ctx) return;
@@ -330,8 +363,16 @@ class ChartManager {
 
             const users = usersData.users;
             
-            // 计算各等级用户的平均活跃度
-            const levelStats = {
+            // 计算各等级用户的平均活跃度 - 文章生成
+            const articleLevelStats = {
+                normal: { total: 0, count: 0 },
+                vip: { total: 0, count: 0 },
+                svip: { total: 0, count: 0 },
+                admin: { total: 0, count: 0 }
+            };
+
+            // 计算各等级用户的平均活跃度 - 图片生成
+            const imageLevelStats = {
                 normal: { total: 0, count: 0 },
                 vip: { total: 0, count: 0 },
                 svip: { total: 0, count: 0 },
@@ -340,16 +381,27 @@ class ChartManager {
 
             users.forEach(user => {
                 const level = user.level || 'normal';
-                const usage = user.articleUsage?.total || 0;
+                const articleUsage = user.articleUsage?.total || 0;
+                const imageUsage = user.imageUsage?.total || 0;
                 
-                if (levelStats[level]) {
-                    levelStats[level].total += usage;
-                    levelStats[level].count++;
+                if (articleLevelStats[level]) {
+                    articleLevelStats[level].total += articleUsage;
+                    articleLevelStats[level].count++;
+                }
+
+                if (imageLevelStats[level]) {
+                    imageLevelStats[level].total += imageUsage;
+                    imageLevelStats[level].count++;
                 }
             });
 
-            const averages = Object.keys(levelStats).map(level => {
-                const stats = levelStats[level];
+            const articleAverages = Object.keys(articleLevelStats).map(level => {
+                const stats = articleLevelStats[level];
+                return stats.count > 0 ? Math.round(stats.total / stats.count) : 0;
+            });
+
+            const imageAverages = Object.keys(imageLevelStats).map(level => {
+                const stats = imageLevelStats[level];
                 return stats.count > 0 ? Math.round(stats.total / stats.count) : 0;
             });
 
@@ -363,12 +415,22 @@ class ChartManager {
                 data: {
                     labels: ['普通用户', 'VIP', 'SVIP', '管理员'],
                     datasets: [{
-                        label: '平均使用次数',
-                        data: averages,
+                        label: '文章生成平均次数',
+                        data: articleAverages,
                         borderColor: this.colors.primary,
                         backgroundColor: this.colors.primary + '30',
                         borderWidth: 2,
                         pointBackgroundColor: this.colors.primary,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }, {
+                        label: '图片生成平均次数',
+                        data: imageAverages,
+                        borderColor: this.colors.success,
+                        backgroundColor: this.colors.success + '30',
+                        borderWidth: 2,
+                        pointBackgroundColor: this.colors.success,
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                         pointRadius: 6
@@ -379,7 +441,25 @@ class ChartManager {
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.r} 次`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -422,7 +502,7 @@ class ChartManager {
         `;
     }
 
-    // Token消耗分布饼图
+    // Token消耗分布饼图（文章生成 + 图片生成）
     async createTokenDistributionChart() {
         const ctx = document.getElementById('tokenDistributionChart');
         if (!ctx) return;
@@ -437,7 +517,7 @@ class ChartManager {
 
             const users = usersData.users;
             
-            // 按token消耗量分组
+            // 按总token消耗量分组（文章生成 + 图片生成）
             const tokenGroups = {
                 '0 Token': 0,
                 '1-100 Token': 0,
@@ -447,7 +527,10 @@ class ChartManager {
             };
 
             users.forEach(user => {
-                const totalTokens = user.tokenUsage?.article?.total || 0;
+                const articleTokens = user.tokenUsage?.article?.total || 0;
+                const imageTokens = user.tokenUsage?.image?.total || 0;
+                const totalTokens = articleTokens + imageTokens;
+                
                 if (totalTokens === 0) {
                     tokenGroups['0 Token']++;
                 } else if (totalTokens <= 100) {
@@ -518,34 +601,44 @@ class ChartManager {
         }
     }
 
-    // Token消耗趋势折线图
+    // Token消耗趋势折线图（文章生成 + 图片生成）
     async createTokenTrendChart() {
         const ctx = document.getElementById('tokenTrendChart');
         if (!ctx) return;
 
         try {
-            // 使用新的历史数据接口
-            const historyData = await window.adminAPI.getTokenHistory();
+            const usersData = await window.adminAPI.getAllUsersNew();
             
-            if (!historyData.success) {
-                this.showChartError(ctx, '获取历史数据失败');
+            if (!usersData.success) {
+                this.showChartError(ctx, '获取数据失败');
                 return;
             }
 
-            // 处理历史数据
-            const last7Days = [];
-            const dates = historyData.dates || [];
-            const consumption = historyData.consumption || [];
+            const users = usersData.users;
             
-            for (let i = 0; i < dates.length; i++) {
-                const date = new Date(dates[i]);
-                const displayDate = date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
-                
-                last7Days.push({
-                    date: displayDate,
-                    tokens: consumption[i] || 0
-                });
+            // 获取最近7天的日期
+            const dates = [];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                dates.push(date.toISOString().split('T')[0]);
             }
+
+            // 计算每天的token消耗（分别统计文章生成和图片生成）
+            const dailyArticleTokens = dates.map(date => {
+                return users.reduce((total, user) => {
+                    const dailyUsage = user.tokenUsage?.article?.daily?.[date] || 0;
+                    return total + dailyUsage;
+                }, 0);
+            });
+
+            const dailyImageTokens = dates.map(date => {
+                return users.reduce((total, user) => {
+                    const dailyUsage = user.tokenUsage?.image?.daily?.[date] || 0;
+                    return total + dailyUsage;
+                }, 0);
+            });
 
             // 销毁现有图表
             if (this.charts.tokenTrend) {
@@ -555,36 +648,67 @@ class ChartManager {
             this.charts.tokenTrend = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: last7Days.map(item => item.date),
-                    datasets: [{
-                        label: 'Token消耗量',
-                        data: last7Days.map(item => item.tokens),
-                        borderColor: this.colors.info,
-                        backgroundColor: this.colors.info + '20',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: this.colors.info,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
+                    labels: dates.map(date => {
+                        const d = new Date(date);
+                        return `${d.getMonth() + 1}/${d.getDate()}`;
+                    }),
+                    datasets: [
+                        {
+                            label: '文章生成Token',
+                            data: dailyArticleTokens,
+                            borderColor: this.colors.primary,
+                            backgroundColor: this.colors.primary + '20',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: this.colors.primary,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        },
+                        {
+                            label: '图片生成Token',
+                            data: dailyImageTokens,
+                            borderColor: this.colors.success,
+                            backgroundColor: this.colors.success + '20',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: this.colors.success,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: false
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
                         },
                         tooltip: {
+                            mode: 'index',
+                            intersect: false,
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             titleColor: '#fff',
                             bodyColor: '#fff',
+                            borderColor: this.colors.primary,
+                            borderWidth: 1,
                             callbacks: {
                                 label: function(context) {
-                                    return `Token消耗: ${context.parsed.y.toLocaleString()}`;
+                                    return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
                                 }
                             }
                         }
@@ -595,6 +719,7 @@ class ChartManager {
                                 display: false
                             },
                             ticks: {
+                                color: '#6c757d',
                                 font: {
                                     size: 11
                                 }
@@ -606,6 +731,7 @@ class ChartManager {
                                 color: 'rgba(0,0,0,0.1)'
                             },
                             ticks: {
+                                color: '#6c757d',
                                 callback: function(value) {
                                     return value.toLocaleString();
                                 },
@@ -614,6 +740,10 @@ class ChartManager {
                                 }
                             }
                         }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     }
                 }
             });
