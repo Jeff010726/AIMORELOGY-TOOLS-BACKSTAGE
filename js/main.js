@@ -238,14 +238,19 @@ class AdminApp {
 
     // 更新Token卡片详细信息
     updateTokenCardDetails(tokenStats) {
+        console.log('更新Token卡片详细信息:', tokenStats);
+        
         // 更新今日Token消耗卡片的标题，显示分类信息
         const dailyTokenCard = document.querySelector('#daily-tokens').closest('.stat-card');
         if (dailyTokenCard) {
             const infoElement = dailyTokenCard.querySelector('p');
-            if (infoElement && tokenStats.dailyArticleTokens !== undefined && tokenStats.dailyImageTokens !== undefined) {
+            if (infoElement) {
                 const articleTokens = tokenStats.dailyArticleTokens || 0;
                 const imageTokens = tokenStats.dailyImageTokens || 0;
-                infoElement.innerHTML = `今日Token消耗<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+                const totalDaily = tokenStats.dailyTokens || (articleTokens + imageTokens);
+                
+                infoElement.innerHTML = `今日Token消耗: ${totalDaily.toLocaleString()}<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+                console.log('更新今日Token卡片:', { totalDaily, articleTokens, imageTokens });
             }
         }
 
@@ -253,10 +258,13 @@ class AdminApp {
         const totalTokenCard = document.querySelector('#total-tokens').closest('.stat-card');
         if (totalTokenCard) {
             const infoElement = totalTokenCard.querySelector('p');
-            if (infoElement && tokenStats.articleTokens !== undefined && tokenStats.imageTokens !== undefined) {
+            if (infoElement) {
                 const articleTokens = tokenStats.articleTokens || 0;
                 const imageTokens = tokenStats.imageTokens || 0;
-                infoElement.innerHTML = `总Token消耗<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+                const totalTokens = tokenStats.totalTokens || (articleTokens + imageTokens);
+                
+                infoElement.innerHTML = `总Token消耗: ${totalTokens.toLocaleString()}<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+                console.log('更新总Token卡片:', { totalTokens, articleTokens, imageTokens });
             }
         }
     }
