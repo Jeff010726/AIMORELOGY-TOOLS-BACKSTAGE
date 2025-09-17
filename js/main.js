@@ -164,54 +164,7 @@ class AdminApp {
                 throw new Error(statsData.error || '获取用户统计数据失败');
             }
 
-            // 获取token统计数据
-            const tokenData = await window.adminAPI.getTokenStats();
-            
-            if (tokenData.success) {
-                const tokenStats = tokenData.stats;
-                
-                // 更新token统计卡片 - 显示总Token消耗（文章生成 + 图片生成）
-                this.updateStatCard('total-tokens', tokenStats.totalTokens || 0);
-                this.updateStatCard('daily-tokens', tokenStats.dailyTokens || 0);
-                
-                // 更新卡片标题以显示详细信息
-                this.updateTokenCardDetails(tokenStats);
-                
-                console.log('Token统计数据:', tokenStats);
-            } else {
-                console.error('获取token统计失败:', tokenData.error);
-                // 如果token统计失败，显示0
-                this.updateStatCard('total-tokens', 0);
-                this.updateStatCard('daily-tokens', 0);
-            }
 
-            // 获取图片生成统计数据
-            try {
-                // 先清除图片统计缓存
-                window.adminAPI.clearCacheByKey('/admin/get_image_stats_{}');
-                
-                const imageData = await window.adminAPI.getImageStats(false);
-                
-                if (imageData.success) {
-                    const imageStats = imageData.stats;
-                    
-                    // 更新图片统计卡片 - 使用正确的字段名
-                    this.updateStatCard('total-images', imageStats.totalImages || 0);
-                    this.updateStatCard('daily-images', imageStats.dailyImages || 0);
-                    
-                    console.log('图片生成统计数据:', imageStats);
-                } else {
-                    console.error('获取图片统计失败:', imageData.error);
-                    // 如果图片统计失败，显示0
-                    this.updateStatCard('total-images', 0);
-                    this.updateStatCard('daily-images', 0);
-                }
-            } catch (error) {
-                console.error('获取图片统计数据失败:', error);
-                // 如果请求失败，显示0
-                this.updateStatCard('total-images', 0);
-                this.updateStatCard('daily-images', 0);
-            }
 
             // 初始化图表
             if (window.chartManager) {
@@ -236,38 +189,7 @@ class AdminApp {
         }
     }
 
-    // 更新Token卡片详细信息
-    updateTokenCardDetails(tokenStats) {
-        console.log('更新Token卡片详细信息:', tokenStats);
-        
-        // 更新今日Token消耗卡片的标题，显示分类信息
-        const dailyTokenCard = document.querySelector('#daily-tokens').closest('.stat-card');
-        if (dailyTokenCard) {
-            const infoElement = dailyTokenCard.querySelector('p');
-            if (infoElement) {
-                const articleTokens = tokenStats.dailyArticleTokens || 0;
-                const imageTokens = tokenStats.dailyImageTokens || 0;
-                const totalDaily = tokenStats.dailyTokens || (articleTokens + imageTokens);
-                
-                infoElement.innerHTML = `今日Token消耗: ${totalDaily.toLocaleString()}<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
-                console.log('更新今日Token卡片:', { totalDaily, articleTokens, imageTokens });
-            }
-        }
 
-        // 更新总Token消耗卡片的标题，显示分类信息
-        const totalTokenCard = document.querySelector('#total-tokens').closest('.stat-card');
-        if (totalTokenCard) {
-            const infoElement = totalTokenCard.querySelector('p');
-            if (infoElement) {
-                const articleTokens = tokenStats.articleTokens || 0;
-                const imageTokens = tokenStats.imageTokens || 0;
-                const totalTokens = tokenStats.totalTokens || (articleTokens + imageTokens);
-                
-                infoElement.innerHTML = `总Token消耗: ${totalTokens.toLocaleString()}<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
-                console.log('更新总Token卡片:', { totalTokens, articleTokens, imageTokens });
-            }
-        }
-    }
 
     // 检查API状态
     async checkAPIStatus() {
