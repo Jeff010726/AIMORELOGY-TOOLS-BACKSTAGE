@@ -601,13 +601,13 @@ class ChartManager {
         }
     }
 
-    // Token消耗趋势折线图（文章生成 + 图片生成）
+    // Token消耗趋势折线图（总Token消耗：文章生成 + 图片生成）
     async createTokenTrendChart() {
         const ctx = document.getElementById('tokenTrendChart');
         if (!ctx) return;
 
         try {
-            // 使用原有的历史数据接口
+            // 使用历史数据接口（已更新支持文章生成+图片生成的总Token消耗）
             const historyData = await window.adminAPI.getTokenHistory();
             
             if (!historyData.success) {
@@ -619,8 +619,7 @@ class ChartManager {
             const dates = historyData.dates || [];
             const consumption = historyData.consumption || [];
             
-            // 暂时只显示文章生成的Token消耗（因为后端接口目前只支持文章生成）
-            // TODO: 后续需要扩展后端接口来支持图片生成的Token历史
+            // 显示总Token消耗（文章生成 + 图片生成）
             const displayDates = dates.map(date => {
                 const d = new Date(date);
                 return `${d.getMonth() + 1}/${d.getDate()}`;
@@ -636,7 +635,7 @@ class ChartManager {
                 data: {
                     labels: displayDates,
                     datasets: [{
-                        label: 'Token消耗量',
+                        label: '总Token消耗',
                         data: consumption,
                         borderColor: this.colors.info,
                         backgroundColor: this.colors.info + '20',
@@ -663,7 +662,7 @@ class ChartManager {
                             bodyColor: '#fff',
                             callbacks: {
                                 label: function(context) {
-                                    return `Token消耗: ${context.parsed.y.toLocaleString()}`;
+                                    return `总Token消耗: ${context.parsed.y.toLocaleString()}`;
                                 }
                             }
                         }
