@@ -607,37 +607,23 @@ class ChartManager {
         if (!ctx) return;
 
         try {
-            const usersData = await window.adminAPI.getAllUsersNew();
+            // 使用原有的历史数据接口
+            const historyData = await window.adminAPI.getTokenHistory();
             
-            if (!usersData.success) {
-                this.showChartError(ctx, '获取数据失败');
+            if (!historyData.success) {
+                this.showChartError(ctx, '获取历史数据失败');
                 return;
             }
 
-            const users = usersData.users;
+            // 处理历史数据
+            const dates = historyData.dates || [];
+            const consumption = historyData.consumption || [];
             
-            // 获取最近7天的日期
-            const dates = [];
-            const today = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                dates.push(date.toISOString().split('T')[0]);
-            }
-
-            // 计算每天的token消耗（分别统计文章生成和图片生成）
-            const dailyArticleTokens = dates.map(date => {
-                return users.reduce((total, user) => {
-                    const dailyUsage = user.tokenUsage?.article?.daily?.[date] || 0;
-                    return total + dailyUsage;
-                }, 0);
-            });
-
-            const dailyImageTokens = dates.map(date => {
-                return users.reduce((total, user) => {
-                    const dailyUsage = user.tokenUsage?.image?.daily?.[date] || 0;
-                    return total + dailyUsage;
-                }, 0);
+            // 暂时只显示文章生成的Token消耗（因为后端接口目前只支持文章生成）
+            // TODO: 后续需要扩展后端接口来支持图片生成的Token历史
+            const displayDates = dates.map(date => {
+                const d = new Date(date);
+                return `${d.getMonth() + 1}/${d.getDate()}`;
             });
 
             // 销毁现有图表
@@ -648,67 +634,36 @@ class ChartManager {
             this.charts.tokenTrend = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates.map(date => {
-                        const d = new Date(date);
-                        return `${d.getMonth() + 1}/${d.getDate()}`;
-                    }),
-                    datasets: [
-                        {
-                            label: '文章生成Token',
-                            data: dailyArticleTokens,
-                            borderColor: this.colors.primary,
-                            backgroundColor: this.colors.primary + '20',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.4,
-                            pointBackgroundColor: this.colors.primary,
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 6,
-                            pointHoverRadius: 8
-                        },
-                        {
-                            label: '图片生成Token',
-                            data: dailyImageTokens,
-                            borderColor: this.colors.success,
-                            backgroundColor: this.colors.success + '20',
-                            borderWidth: 3,
-                            fill: false,
-                            tension: 0.4,
-                            pointBackgroundColor: this.colors.success,
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 6,
-                            pointHoverRadius: 8
-                        }
-                    ]
+                    labels: displayDates,
+                    datasets: [{
+                        label: 'Token消耗量',
+                        data: consumption,
+                        borderColor: this.colors.info,
+                        backgroundColor: this.colors.info + '20',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: this.colors.info,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: {
-                                    size: 12
-                                }
-                            }
+                            display: false
                         },
                         tooltip: {
-                            mode: 'index',
-                            intersect: false,
                             backgroundColor: 'rgba(0,0,0,0.8)',
                             titleColor: '#fff',
                             bodyColor: '#fff',
-                            borderColor: this.colors.primary,
-                            borderWidth: 1,
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.dataset.label}: ${context.parsed.y.toLocaleString()}`;
+                                    return `Token消耗: ${context.parsed.y.toLocaleString()}`;
                                 }
                             }
                         }
@@ -719,7 +674,6 @@ class ChartManager {
                                 display: false
                             },
                             ticks: {
-                                color: '#6c757d',
                                 font: {
                                     size: 11
                                 }
@@ -731,7 +685,6 @@ class ChartManager {
                                 color: 'rgba(0,0,0,0.1)'
                             },
                             ticks: {
-                                color: '#6c757d',
                                 callback: function(value) {
                                     return value.toLocaleString();
                                 },
@@ -740,10 +693,6 @@ class ChartManager {
                                 }
                             }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
