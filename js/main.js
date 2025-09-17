@@ -170,9 +170,12 @@ class AdminApp {
             if (tokenData.success) {
                 const tokenStats = tokenData.stats;
                 
-                // 更新token统计卡片
+                // 更新token统计卡片 - 显示总Token消耗（文章生成 + 图片生成）
                 this.updateStatCard('total-tokens', tokenStats.totalTokens || 0);
                 this.updateStatCard('daily-tokens', tokenStats.dailyTokens || 0);
+                
+                // 更新卡片标题以显示详细信息
+                this.updateTokenCardDetails(tokenStats);
                 
                 console.log('Token统计数据:', tokenStats);
             } else {
@@ -230,6 +233,31 @@ class AdminApp {
                 element.textContent = value.toLocaleString();
                 element.style.opacity = '1';
             }, 200);
+        }
+    }
+
+    // 更新Token卡片详细信息
+    updateTokenCardDetails(tokenStats) {
+        // 更新今日Token消耗卡片的标题，显示分类信息
+        const dailyTokenCard = document.querySelector('#daily-tokens').closest('.stat-card');
+        if (dailyTokenCard) {
+            const infoElement = dailyTokenCard.querySelector('p');
+            if (infoElement && tokenStats.dailyArticleTokens !== undefined && tokenStats.dailyImageTokens !== undefined) {
+                const articleTokens = tokenStats.dailyArticleTokens || 0;
+                const imageTokens = tokenStats.dailyImageTokens || 0;
+                infoElement.innerHTML = `今日Token消耗<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+            }
+        }
+
+        // 更新总Token消耗卡片的标题，显示分类信息
+        const totalTokenCard = document.querySelector('#total-tokens').closest('.stat-card');
+        if (totalTokenCard) {
+            const infoElement = totalTokenCard.querySelector('p');
+            if (infoElement && tokenStats.articleTokens !== undefined && tokenStats.imageTokens !== undefined) {
+                const articleTokens = tokenStats.articleTokens || 0;
+                const imageTokens = tokenStats.imageTokens || 0;
+                infoElement.innerHTML = `总Token消耗<br><small style="font-size: 0.8em; opacity: 0.8;">文章: ${articleTokens.toLocaleString()} | 图片: ${imageTokens.toLocaleString()}</small>`;
+            }
         }
     }
 
