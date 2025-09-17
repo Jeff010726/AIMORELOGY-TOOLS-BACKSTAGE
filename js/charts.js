@@ -608,7 +608,8 @@ class ChartManager {
 
         try {
             // 使用历史数据接口（已更新支持文章生成+图片生成的总Token消耗）
-            const historyData = await window.adminAPI.getTokenHistory();
+            // 强制不使用缓存，获取最新数据
+            const historyData = await window.adminAPI.getTokenHistory(false);
             
             if (!historyData.success) {
                 this.showChartError(ctx, '获取历史数据失败');
